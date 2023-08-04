@@ -1,0 +1,12 @@
+exclude = [
+    "migrations",
+    "__pycache__",
+    "manage.py",
+    "settings.py",
+    "venv"
+]
+select = [
+    "E",
+    "F",
+    "W"
+]

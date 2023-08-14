@@ -1,74 +1,70 @@
 """
 Database models.
 """
+
+from decimal import Decimal
 from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import (
-    AbstractBaseUser,
-    BaseUserManager,
-    PermissionsMixin,
-)
-from django.core.validators import EmailValidator
-from django.utils import timezone
+
+from .currency_choices import CURRENCY_CHOICES
 
 
-class UserManager(BaseUserManager):
-    """Manager for users."""
+class CommonInfo(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    objects = models.Manager()
 
-    def _create_user(self, email, password=None, **extra_fields):
-        """Create, save and return a new user."""
-        if not email:
-            raise ValueError('User must have an email address.')
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-
-        return user
-
-    def create_user(self, email, password=None, **extra_fields):
-        """Create a new user."""
-        extra_fields.setdefault("is_staff", False)
-        extra_fields.setdefault("is_superuser", False)
-
-        return self._create_user(email, password, **extra_fields)
-
-    def create_superuser(self, email, password=None, **extra_fields):
-        """Create a new superuser."""
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
-        return self._create_user(email, password, **extra_fields)
+    class Meta:
+        ordering = ["-created"]
+        abstract = True
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    """User in the system."""
-    email_validator = EmailValidator()
+class Budget(CommonInfo):
+    """Budget of a specific user."""
 
-    email = models.EmailField(
-        "email",
-        max_length=50,
-        unique=True,
-        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
-        validators=[email_validator],
-        error_messages={
-            "unique": "A user with that username already exists.",
-        },
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    currency = models.CharField(
+        max_length=15, choices=CURRENCY_CHOICES, blank=False, default="DEFAULT"
     )
-    is_staff = models.BooleanField(
-        "staff status",
-        default=False,
-        help_text="Designates whether the user can log into this admin site.",
-    )
-    is_active = models.BooleanField(
-        "active",
-        default=True,
-        help_text=(
-            "Designates whether this user should be treated as active. "
-            "Unselect this instead of deleting accounts."
-        ),
-    )
-    date_joined = models.DateTimeField("date joined", default=timezone.now)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0"))
 
-    objects = UserManager()
+    def __str__(self):
+        return "%s ID(%s)" % (self.user.email, self.pk)
 
-    USERNAME_FIELD = "email"
+
+class Category(CommonInfo):
+    """Base model for income and expense categories."""
+
+    CATEGORY_TYPES = [
+        (None, "Select category type"),
+        ("Income", "Income"),
+        ("Expense", "Expense"),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    category_type = models.CharField(
+        max_length=7, choices=CATEGORY_TYPES, blank=False, default=CATEGORY_TYPES[0]
+    )
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
+    def __str__(self):
+        return self.name
+
+
+class Transaction(CommonInfo):
+    """Represents budget transactions."""
+
+    budget = models.ForeignKey(Budget, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    notes = models.TextField(blank=True)
+
+
+# class Cashflow(CommonInfo):
+#     """Base class for income and expense."""
+#     budget = models.ForeignKey(Budget, on_delete=models.CASCADE)
+#     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+#     amount = models.IntegerField()
+#     notes = models.TextField()

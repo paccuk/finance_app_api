@@ -167,3 +167,38 @@ class PrivateBudgetAPITest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Budget.objects.filter(id=budget.id).exists())
+
+    def test_retrieve_budgets_with_range_filter_successful(self):
+        Budget.objects.create(user=self.user, currency="UAH", balance=Decimal("50000"))
+        Budget.objects.create(user=self.user, currency="UAH", balance=Decimal("25000"))
+
+        res1 = self.client.get(BUDGETS_URL, {"balance_range": "40000, 60000"})
+        res2 = self.client.get(BUDGETS_URL, {"balance_range": ",60000"})
+        res3 = self.client.get(BUDGETS_URL, {"balance_range": "40000,"})
+
+        self.assertEqual(res1.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res1.data), 1)
+
+        self.assertEqual(res2.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res2.data), 2)
+
+        self.assertEqual(res3.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res3.data), 1)
+
+    def test_retrieve_budgets_with_balance_filter_successful(self):
+        Budget.objects.create(user=self.user, currency="UAH", balance=Decimal("25000"))
+        Budget.objects.create(user=self.user, currency="UAH", balance=Decimal("30000"))
+
+        res = self.client.get(BUDGETS_URL, {"balance": "25000"})
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+
+    def test_retrieve_budgets_with_currency_filter_successful(self):
+        Budget.objects.create(user=self.user, currency="USD", balance=Decimal("25000"))
+        Budget.objects.create(user=self.user, currency="UAH", balance=Decimal("30000"))
+
+        res = self.client.get(BUDGETS_URL, {"currencies": "uaH"})
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)

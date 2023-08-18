@@ -5,7 +5,27 @@ from rest_framework import serializers
 
 from core.models import (
     Budget,
+    Category,
+    Transaction,
 )
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Serializer for categories."""
+
+    class Meta:
+        model = Category
+        fields = ["id", "user", "name", "category_type"]
+        read_only_fields = ["id", "user"]
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+    """Serializer for the transactions."""
+
+    class Meta:
+        model = Transaction
+        fields = ["id", "budget", "category", "amount", "notes"]
+        read_only_fields = ["id", "budget"]
 
 
 class BudgetSerializer(serializers.ModelSerializer):
@@ -13,19 +33,8 @@ class BudgetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Budget
-        fields = ["id", "currency", "balance"]
-        read_only_fields = ["id"]
-
-    def create(self, validated_data):
-        budget = Budget.objects.create(**validated_data)
-        return budget
-
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-
-        instance.save()
-        return instance
+        fields = ["id", "user", "currency", "balance"]
+        read_only_fields = ["id", "user"]
 
 
 class BudgetDetailSerializer(BudgetSerializer):

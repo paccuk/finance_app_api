@@ -1,5 +1,4 @@
 CURRENCY_CHOICES = [
-    (None, 'Select currency'),
     ('ALL', 'ALL'),
     ('AFN', 'AFN'),
     ('ARS', 'ARS'),

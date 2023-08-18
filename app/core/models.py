@@ -22,9 +22,7 @@ class Budget(CommonInfo):
     """Budget of a specific user."""
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    currency = models.CharField(
-        max_length=15, choices=CURRENCY_CHOICES, blank=False, default="DEFAULT"
-    )
+    currency = models.CharField(max_length=15, choices=CURRENCY_CHOICES, blank=False)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0"))
 
     def __str__(self):
@@ -35,16 +33,13 @@ class Category(CommonInfo):
     """Base model for income and expense categories."""
 
     CATEGORY_TYPES = [
-        (None, "Select category type"),
         ("Income", "Income"),
         ("Expense", "Expense"),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
-    category_type = models.CharField(
-        max_length=7, choices=CATEGORY_TYPES, blank=False, default=CATEGORY_TYPES[0]
-    )
+    category_type = models.CharField(max_length=7, choices=CATEGORY_TYPES, blank=False)
 
     class Meta:
         verbose_name_plural = "Categories"
@@ -64,6 +59,7 @@ class Transaction(CommonInfo):
 
 # class Cashflow(CommonInfo):
 #     """Base class for income and expense."""
+
 #     budget = models.ForeignKey(Budget, on_delete=models.CASCADE)
 #     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 #     amount = models.IntegerField()

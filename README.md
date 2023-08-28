@@ -1,5 +1,5 @@
 # Finance App API
-`finance_app_api is a simple budgeting api for use with Django.`
+`finance_app_api` is a simple budgeting api for use with Django.
 
 ## Requirements
 `finance_app_api` requires:

@@ -22,12 +22,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-s=yeq0(7vdp&m$ev^-dp*rp$i%37_p@w5d*#v0p#2a4$#ng31("
+SECRET_KEY = os.environ.get("SECRET_KEY", None)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 
 ALLOWED_HOSTS = []
+ALLOWED_HOSTS.extend(
+    filter(
+        None,
+        os.environ.get("ALLOWED_HOSTS", "").split(","),
+    )
+)
 
 # Application definition
 
@@ -50,7 +56,6 @@ INSTALLED_APPS = [
     "corsheaders",
 ]
 
-AUTH_USER_MODEL = "user.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -89,7 +94,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
 
@@ -132,10 +137,11 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+AUTH_USER_MODEL = "user.User"
+
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
@@ -155,11 +161,18 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://127.0.0.1:8000",
-]
+CORS_ALLOWED_ORIGINS = []
+CORS_ALLOWED_ORIGINS.extend(
+    filter(
+        None,
+        os.environ.get("CORS_ALLOWED_ORIGINS", "").split(","),
+    )
+)
 
-# CSRF_TRUSTED_ORIGINS = [
-#     "https://read-and-write.example.com",
-# ]
+CSRF_TRUSTED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS.extend(
+    filter(
+        None,
+        os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(","),
+    )
+)

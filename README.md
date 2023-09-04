@@ -4,9 +4,7 @@
 ## Requirements
 `finance_app_api` requires:
 
-- Python 3.10+
-- Django 4.2+
-
+- Docker 24.0.*
 ## Run
 ```bash
 docker-compose -f docker-compose-deploy.yml up

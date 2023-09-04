@@ -4,7 +4,7 @@
 ## Requirements
 `finance_app_api` requires:
 
-- Docker 24*
+- Docker 24.*
 ## Run
 ```bash
 docker-compose -f docker-compose-deploy.yml up

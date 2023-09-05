@@ -38,7 +38,8 @@ from . import serializers
             OpenApiParameter(
                 "balance_range",
                 OpenApiTypes.STR,
-                description="Range of transaction amount values to filter (min, max) (min,) (, max)",
+                description="Range of transaction amount values to filter\
+                             (min, max) (min,) (, max)",
             ),
             OpenApiParameter(
                 "currencies",
@@ -56,11 +57,11 @@ class BudgetViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    _params_to_decimal = lambda self, qs: Decimal(str(qs))
+    def _params_to_decimal(self, qs):
+        return Decimal(str(qs))
 
-    _params_to_upper_str_list = lambda self, qs: [
-        value.strip().upper() for value in qs.split(",")
-    ]
+    def _params_to_upper_str_list(self, qs):
+        return [value.strip().upper() for value in qs.split(",")]
 
     def _get_balance_range_filtered_queryset(self, queryset, balance_range):
         _balance_range = [value.strip() for value in balance_range.split(",")]

@@ -1,11 +1,17 @@
 # Finance App API
+
 `finance_app_api` is a simple budgeting api for use with Django.
 
-## Requirements
-`finance_app_api` requires:
+## Installation
 
-- Docker 24.*
+```bash
+git clone https://github.com/paccuk/finance_app_api.git
+```
+
+> Create `.env` file
+
 ## Run
+
 ```bash
 docker-compose -f docker-compose-deploy.yml up
 ```

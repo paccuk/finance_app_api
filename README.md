@@ -8,7 +8,7 @@
 git clone https://github.com/paccuk/finance_app_api.git
 ```
 
-> Create `.env` file
+Create `.env` file
 
 ## Run
 

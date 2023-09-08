@@ -8,10 +8,6 @@
 git clone https://github.com/paccuk/finance_app_api.git
 ```
 
-Create and fill `.env` file
-
-## Run
-
 ```bash
 docker-compose -f docker-compose-deploy.yml up
 ```
